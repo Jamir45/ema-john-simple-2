@@ -1,0 +1,11 @@
+.mainContainer{display: flex;}
+.productSection{
+    width: 75%;
+    border-right: 1px solid lightgray;
+    padding: 20px 0px;
+}
+.cartSection{
+    width: 25%;
+
+    padding: 20px;
+}

@@ -1,0 +1,18 @@
+.ship-form {
+    overflow: hidden;
+    max-width: 300px;
+    margin: auto;
+    padding: 22px;
+}
+.ship-form input {
+    display: block;
+    width: 100%;
+    margin: 20px 0px 0px 0px;
+    padding: 5px;
+    font-size: 17px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+.error{
+    color: red;
+}
