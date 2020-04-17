@@ -25,6 +25,7 @@ const getUser = (user)=>{
     return {Name:displayName, Email:email, photoURL}
 }
 
+
 export const PrivateRoute =({ children, ...rest }) => {
     const auth = useAuth();
     return (

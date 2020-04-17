@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Review.css'
 import { getDatabaseCart, removeFromDatabaseCart, processOrder } from '../../utilities/databaseManager';
-import fakeData from '../../fakeData';
 import Reviewall from './Reviewall';
 import Cart from '../Cart/Cart';
 import { Link } from 'react-router-dom';
@@ -18,14 +17,25 @@ const Review = () => {
         const savedData = getDatabaseCart();
         // (১২.২) এখানে আমরা key টাকে আলাদাভাবে পাওয়ার জন্য savedData থেকে Object.keys এর সাহায্যে আলাদাকরে নিয়েছি । 
         const productKeys = Object.keys(savedData);
-
-        // (১২.৩) আবার এখানে আমরা productKeys থেকে নেওয়া key দিয়ে ঐ key এর নির্দিষ্ট প্রোডাক্ট কে আলাদাভাবে পাওয়ার জন্য productKeys কে map করে প্রত্যেকটি উপাদানকে আলাদা করা হয় । এর পর সেই উপাদানকে fakeData থেকে find এর সাহায্যে productKeys থেকে পাওয়া key এর সাথে Match করিয়ে নির্দিষ্ট প্রোডাক্ট কে নেওয়া হয় । এবং প্রোডাক্ট এর সংখ্যাকেই তার quantity হিসেবে আলাদা করা হয় ।
-        const cartProduct = productKeys.map( key => {
-            const product = fakeData.find( itemKey => itemKey.key === key);
-            product.quantity= savedData[key];
-            return product
-        });
-        setData(cartProduct);
+        console.log(productKeys)
+        fetch('https://node-mongo-jamir.herokuapp.com/reviewProducts', {
+            method:"POST",
+            headers:{
+                'Content-type':'application/json'
+            },
+            body: JSON.stringify(productKeys)
+        })
+        .then(res => res.json())
+        .then(data =>{
+            console.log(data)
+            // (১২.৩) আবার এখানে আমরা productKeys থেকে নেওয়া key দিয়ে ঐ key এর নির্দিষ্ট প্রোডাক্ট কে আলাদাভাবে পাওয়ার জন্য productKeys কে map করে প্রত্যেকটি উপাদানকে আলাদা করা হয় । এর পর সেই উপাদানকে fakeData থেকে find এর সাহায্যে productKeys থেকে পাওয়া key এর সাথে Match করিয়ে নির্দিষ্ট প্রোডাক্ট কে নেওয়া হয় । এবং প্রোডাক্ট এর সংখ্যাকেই তার quantity হিসেবে আলাদা করা হয় ।
+            const cartProduct = productKeys.map( key => {
+                const product = data.find( itemKey => itemKey.key === key);
+                product.quantity= savedData[key];
+                return product
+            });
+            setData(cartProduct);
+            })
     }, []);
 
     // (১৪) এবার আমাদের cart এ add করা প্রোডাক্ট কে remove করার জন্য removeHandler function টি লিখেছি । এখানে আমরা প্রথমে প্রোডাক্ট এর key কে access করে নিয়েছি । তার পর উপরের useState এ রাখা data কে filter করে এই যে প্রোডাক্ট এর key এর সাথে এই key match করবে সেই প্রোডাক্ট কে removed করে দিবে । 

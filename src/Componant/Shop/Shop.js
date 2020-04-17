@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './Shop.css';
-import fakeData from '../../fakeData'
 import Product from '../Product/Product';
 import Cart from '../Cart/Cart';
 import { addToDatabaseCart, getDatabaseCart } from '../../utilities/databaseManager';
@@ -8,9 +7,17 @@ import { Link } from 'react-router-dom';
 
 
 const Shop = () => {
-    const fist20 = fakeData.slice(0, 20)
     // (১) এখানে আমরা এই useState এর সাহায্যে fakeData থেকে data গুলোকে সংগ্রহ করব । 
-    const [data, setData] = useState(fist20);
+    const [data, setData] = useState([]);
+    useEffect( () => {
+        fetch('https://node-mongo-jamir.herokuapp.com/product')
+        .then(res => res.json())
+        .then(data => {
+            const fist20 = data.slice(0, 20);
+            setData(fist20);
+        })
+    }, [])
+
 
     // (৭) user Add to cart বাটন এ click করার পর productHandler এর সাহায্যে যে কাজ গুলো করবে সেগুলোকে এই state এর সাহায্যে cart এ পাঠানো হবে ।
     const [cart, setCart] = useState([])
@@ -21,14 +28,16 @@ const Shop = () => {
         // (৪.২) এখানে আমরা key টাকে আলাদাভাবে পাওয়ার জন্য savedData থেকে Object.keys এর সাহায্যে আলাদাকরে নিয়েছি । 
         const productKeys = Object.keys(savedData);
 
-        // (৪.৩) আবার এখানে আমরা productKeys থেকে নেওয়া key দিয়ে ঐ key এর নির্দিষ্ট প্রোডাক্ট কে আলাদাভাবে পাওয়ার জন্য productKeys কে map করে প্রত্যেকটি উপাদানকে আলাদা করা হয় । এর পর সেই উপাদানকে fakeData থেকে find এর সাহায্যে productKeys থেকে পাওয়া key এর সাথে Match করিয়ে নির্দিষ্ট প্রোডাক্ট কে নেওয়া হয় । এবং প্রোডাক্ট এর সংখ্যাকেই তার quantity হিসেবে আলাদা করা হয় ।
-        const cartProduct = productKeys.map( key => {
-            const product = fakeData.find( itemKey => itemKey.key === key);
-            product.quantity= savedData[key];
-            return product
-        });
-        setCart(cartProduct);
-    }, []);
+        // (৪.৩) আবার এখানে আমরা productKeys থেকে নেওয়া key দিয়ে ঐ key এর নির্দিষ্ট প্রোডাক্ট কে আলাদাভাবে পাওয়ার জন্য productKeys কে map করে প্রত্যেকটি উপাদানকে আলাদা করা হয় । এর পর সেই উপাদানকে database থেকে find এর সাহায্যে productKeys থেকে পাওয়া key এর সাথে Match করিয়ে নির্দিষ্ট প্রোডাক্ট কে নেওয়া হয় । এবং প্রোডাক্ট এর সংখ্যাকেই তার quantity হিসেবে আলাদা করা হয় ।
+        if(data.length){
+            const cartProduct = productKeys.map( key => {
+                const product = data.find( itemKey => itemKey.key === key);
+                product.quantity= savedData[key];
+                return product
+            });
+            setCart(cartProduct);
+        }
+    }, [data]);
 
     // (4) এই productHandler সাহায্যে আমরা প্রত্যেকটি product কে আলাদা আলাদা ভাবে select করতে চাই । তাই আমরা এখানে parameter হিসেবে clickedProduct দিয়েছি ।
     const productHandler = ( (clickedProduct) => {
